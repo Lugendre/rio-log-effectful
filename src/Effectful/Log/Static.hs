@@ -1,6 +1,7 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# OPTIONS_GHC -Wno-unused-imports #-}
 
 module Effectful.Log.Static (
   -- ** Running with logging
@@ -124,6 +125,7 @@ import RIO (
   unless,
   when,
  )
+import RIO qualified as RIO
 import System.IO (localeEncoding)
 
 -- | Provide the ability to log messages via 'LogFunc' like 'RIO'.
@@ -149,17 +151,14 @@ runLog options inner =
 An implementation may choose any behavior of this value it wishes,
 including printing to standard output or no action at all.
 
-@since 0.0.0.0
+Reworked 'RIO.LogFunc'.
 -}
 data LogFunc = LogFunc
   { unLogFunc :: !(CallStack -> LogSource -> LogLevel -> Utf8Builder -> IO ())
   , lfOptions :: !(Maybe LogOptions)
   }
 
-{- | Perform both sets of actions per log entry.
-
-@since 0.0.0.0
--}
+-- | Perform both sets of actions per log entry.
 instance Semigroup LogFunc where
   LogFunc f o1 <> LogFunc g o2 =
     LogFunc
@@ -167,24 +166,21 @@ instance Semigroup LogFunc where
       , lfOptions = o1 `mplus` o2
       }
 
-{- | 'mempty' peforms no logging.
-
-@since 0.0.0.0
--}
+-- | 'mempty' peforms no logging.
 instance Monoid LogFunc where
   mempty = mkLogFunc $ \_ _ _ _ -> return ()
   mappend = (<>)
 
 {- | Create a 'LogFunc' from the given function.
 
-@since 0.0.0.0
+Reworked 'RIO.mkLogFunc'.
 -}
 mkLogFunc :: (CallStack -> LogSource -> LogLevel -> Utf8Builder -> IO ()) -> LogFunc
 mkLogFunc f = LogFunc f Nothing
 
 {- | Generic, basic function for creating other logging functions.
 
-@since 0.0.0.0
+Reworked 'RIO.logGeneric'.
 -}
 logGeneric ::
   (Log :> es, HasCallStack) =>
@@ -198,7 +194,7 @@ logGeneric src level str = do
 
 {- | Log a debug level message with no source.
 
-@since 0.0.0.0
+Reworked 'RIO.logDebug'.
 -}
 logDebug ::
   (Log :> es, HasCallStack) =>
@@ -208,7 +204,7 @@ logDebug = logGeneric "" LevelDebug
 
 {- | Log an info level message with no source.
 
-@since 0.0.0.0
+Reworked 'RIO.logInfo'.
 -}
 logInfo ::
   (Log :> es, HasCallStack) =>
@@ -218,7 +214,7 @@ logInfo = logGeneric "" LevelInfo
 
 {- | Log a warn level message with no source.
 
-@since 0.0.0.0
+Reworked 'RIO.logWarn'.
 -}
 logWarn ::
   (Log :> es, HasCallStack) =>
@@ -228,7 +224,7 @@ logWarn = logGeneric "" LevelWarn
 
 {- | Log an error level message with no source.
 
-@since 0.0.0.0
+Reworked 'RIO.logError'.
 -}
 logError ::
   (Log :> es, HasCallStack) =>
@@ -238,7 +234,7 @@ logError = logGeneric "" LevelError
 
 {- | Log a message with the specified textual level and no source.
 
-@since 0.0.0.0
+Reworked 'RIO.logOther'.
 -}
 logOther ::
   (Log :> es, HasCallStack) =>
@@ -262,7 +258,7 @@ result in
 
 {- | Log a debug level message with the given source.
 
-@since 0.0.0.0
+Reworked 'RIO.logDebugS'.
 -}
 logDebugS ::
   (Log :> es, HasCallStack) =>
@@ -273,7 +269,7 @@ logDebugS src = logGeneric src LevelDebug
 
 {- | Log an info level message with the given source.
 
-@since 0.0.0.0
+Reworked 'RIO.logInfoS'.
 -}
 logInfoS ::
   (Log :> es, HasCallStack) =>
@@ -284,7 +280,7 @@ logInfoS src = logGeneric src LevelInfo
 
 {- | Log a warn level message with the given source.
 
-@since 0.0.0.0
+Reworked 'RIO.logWarnS'.
 -}
 logWarnS ::
   (Log :> es, HasCallStack) =>
@@ -295,7 +291,7 @@ logWarnS src = logGeneric src LevelWarn
 
 {- | Log an error level message with the given source.
 
-@since 0.0.0.0
+Reworked 'RIO.logErrorS'.
 -}
 logErrorS ::
   (Log :> es, HasCallStack) =>
@@ -307,7 +303,7 @@ logErrorS src = logGeneric src LevelError
 {- | Log a message with the specified textual level and the given
 source.
 
-@since 0.0.0.0
+Reworked 'RIO.logOtherS'.
 -}
 logOtherS ::
   (Log :> es, HasCallStack) =>
@@ -329,7 +325,7 @@ Note that not all 'LogFunc' implementations will support sticky
 messages as described. However, the 'withLogFunc' implementation
 provided by this module does.
 
-@since 0.0.0.0
+Reworked 'RIO.logSticky'.
 -}
 logSticky :: (Log :> es, HasCallStack) => Utf8Builder -> Eff es ()
 logSticky = logOther "sticky"
@@ -338,7 +334,7 @@ logSticky = logOther "sticky"
 any further stickiness of the line until a new call to 'logSticky'
 happens.
 
-@since 0.0.0.0
+Reworked 'RIO.logStickyDone'.
 -}
 logStickyDone :: (Log :> es, HasCallStack) => Utf8Builder -> Eff es ()
 logStickyDone = logOther "sticky-done"
@@ -360,7 +356,7 @@ This will default to non-verbose settings and assume there is a
 terminal attached. These assumptions can be overridden using the
 appropriate @set@ functions.
 
-@since 0.0.0.0
+Reworked 'RIO.logOptionsMemory'.
 -}
 logOptionsMemory :: (MonadIO m) => m (IORef Builder, LogOptions)
 logOptionsMemory = do
@@ -393,7 +389,7 @@ When Verbose Flag is @True@, the following happens:
     * @setLogUseTime@ is called with @True@
     * @setLogMinLevel@ is called with 'Debug' log level
 
-@since 0.0.0.0
+Reworked 'RIO.logOptionsHandle'.
 -}
 logOptionsHandle ::
   (MonadIO m) =>
@@ -447,7 +443,7 @@ disposes it.
 Intended for use if you want to deal with the teardown of 'LogFunc' yourself,
 otherwise prefer the 'withLogFunc' function instead.
 
- @since 0.1.3.0
+Reworked 'RIO.newLogFunc'.
 -}
 newLogFunc :: (MonadIO n, MonadIO m) => LogOptions -> n (LogFunc, m ())
 newLogFunc options =
@@ -490,7 +486,7 @@ withLogFunc logOptions $ \\lf -> do
     myApp
 @
 
-@since 0.0.0.0
+Reworked 'RIO.withLogFunc'.
 -}
 withLogFunc :: (MonadUnliftIO m) => LogOptions -> (LogFunc -> m a) -> m a
 withLogFunc options inner = withRunInIO $ \run -> do
@@ -513,7 +509,7 @@ noSticky level = level
 {- | Configuration for how to create a 'LogFunc'. Intended to be used
 with the 'withLogFunc' function.
 
-@since 0.0.0.0
+Reworked 'RIO.LogOptions'.
 -}
 data LogOptions = LogOptions
   { logMinLevel :: !(IO LogLevel)
@@ -530,7 +526,7 @@ data LogOptions = LogOptions
 {- | ANSI color codes for use in the configuration of the creation of a
 'LogFunc'.
 
-@since 0.1.18.0
+Reworked 'RIO.LogColors'.
 -}
 data LogColors = LogColors
   { logColorLogLevels :: !(LogLevel -> Utf8Builder)
@@ -567,7 +563,7 @@ printed.
 
 Default: in verbose mode, 'LevelDebug'. Otherwise, 'LevelInfo'.
 
-@since 0.0.0.0
+Reworked 'RIO.setLogMinLevel'.
 -}
 setLogMinLevel :: LogLevel -> LogOptions -> LogOptions
 setLogMinLevel level options = options{logMinLevel = return level}
@@ -577,7 +573,7 @@ value dynamically at runtime.
 
 Default: in verbose mode, 'LevelDebug'. Otherwise, 'LevelInfo'.
 
-@since 0.1.3.0
+Reworked 'RIO.setLogMinLevelIO'.
 -}
 setLogMinLevelIO :: IO LogLevel -> LogOptions -> LogOptions
 setLogMinLevelIO getLevel options = options{logMinLevel = getLevel}
@@ -586,7 +582,7 @@ setLogMinLevelIO getLevel options = options{logMinLevel = getLevel}
 
 Default: follows the value of the verbose flag.
 
-@since 0.0.0.0
+Reworked 'RIO.setLogVerboseFormat'.
 -}
 setLogVerboseFormat :: Bool -> LogOptions -> LogOptions
 setLogVerboseFormat v options = options{logVerboseFormat = return v}
@@ -596,7 +592,7 @@ setLogVerboseFormat v options = options{logVerboseFormat = return v}
 
 Default: follows the value of the verbose flag.
 
-@since 0.1.3.0
+Reworked 'RIO.setLogVerboseFormatIO'.
 -}
 setLogVerboseFormatIO :: IO Bool -> LogOptions -> LogOptions
 setLogVerboseFormatIO getVerboseLevel options =
@@ -608,7 +604,7 @@ sticky logging functionality.
 Default: checks if the @Handle@ provided to 'logOptionsHandle' is a
 terminal with 'hIsTerminalDevice'.
 
-@since 0.0.0.0
+Reworked 'RIO.setLogTerminal'.
 -}
 setLogTerminal :: Bool -> LogOptions -> LogOptions
 setLogTerminal t options = options{logTerminal = t}
@@ -617,7 +613,7 @@ setLogTerminal t options = options{logTerminal = t}
 
 Default: `True` in debug mode, `False` otherwise.
 
-@since 0.0.0.0
+Reworked 'RIO.setLogUseTime'.
 -}
 setLogUseTime :: Bool -> LogOptions -> LogOptions
 setLogUseTime t options = options{logUseTime = t}
@@ -626,7 +622,7 @@ setLogUseTime t options = options{logUseTime = t}
 
 Default: `True` if in verbose mode /and/ the 'Handle' is a terminal device.
 
-@since 0.0.0.0
+Reworked 'RIO.setLogUserColor'.
 -}
 setLogUseColor :: Bool -> LogOptions -> LogOptions
 setLogUseColor c options = options{logUseColor = c}
@@ -639,7 +635,7 @@ Default: 'LevelDebug'   = \"\\ESC[32m\" -- Green
          'LevelError'   = \"\\ESC[31m\" -- Red
          'LevelOther' _ = \"\\ESC[35m\" -- Magenta
 
-@since 0.1.18.0
+Reworked 'RIO.setLogLevelColors'.
 -}
 setLogLevelColors :: (LogLevel -> Utf8Builder) -> LogOptions -> LogOptions
 setLogLevelColors logLevelColors options =
@@ -650,7 +646,7 @@ setLogLevelColors logLevelColors options =
 
 Default: \"\\ESC[90m\" -- Bright black (gray)
 
-@since 0.1.18.0
+Reworked 'RIO.setLogSecondaryColor'.
 -}
 setLogSecondaryColor :: Utf8Builder -> LogOptions -> LogOptions
 setLogSecondaryColor c options =
@@ -662,7 +658,7 @@ by 'Int'.
 
 Default: 'const' \"\\ESC[92m\" -- Bright green, for all indicies
 
-@since 0.1.18.0
+Reworked 'RIO.setLogAccentColors'.
 -}
 setLogAccentColors ::
   -- | This should be a total function.
@@ -677,7 +673,7 @@ setLogAccentColors accentColors options =
 
 Default: `True` if in verbose mode, `False` otherwise.
 
-@since 0.1.2.0
+Reworked 'RIO.setLogUseLoc'.
 -}
 setLogUseLoc :: Bool -> LogOptions -> LogOptions
 setLogUseLoc l options = options{logUseLoc = l}
@@ -686,7 +682,7 @@ setLogUseLoc l options = options{logUseLoc = l}
 
 Default: `id`
 
-@since 0.1.13.0
+Reworked 'RIO.setLogFormat'.
 -}
 setLogFormat :: (Utf8Builder -> Utf8Builder) -> LogOptions -> LogOptions
 setLogFormat f options = options{logFormat = f}
@@ -761,7 +757,7 @@ the first source location.
 
 TODO Consider showing the entire call stack instead.
 
-@since 0.0.0.0
+Reworked 'RIO.displayCallStack'.
 -}
 displayCallStack :: CallStack -> Utf8Builder
 displayCallStack cs =
@@ -777,6 +773,8 @@ displayCallStack cs =
 
 {- | The length of a timestamp in the format "YYYY-MM-DD hh:mm:ss.μμμμμμ".
 This definition is top-level in order to avoid multiple reevaluation at runtime.
+
+Reworked 'RIO.timestampLength'.
 -}
 timestampLength :: Int
 timestampLength =
@@ -824,6 +822,8 @@ stickyImpl ref lo logFunc loc src level msgOrig = modifyMVar_ ref $ \(sticky, st
 
 {- | The number of Unicode characters in a UTF-8 encoded byte string,
 excluding ANSI CSI sequences.
+
+Reworked 'RIO.utf8CharacterCount'.
 -}
 utf8CharacterCount :: ByteString -> Int
 utf8CharacterCount = go 0
@@ -853,7 +853,7 @@ or anywhere else as needed. You can decide how to log levels or
 severities based on the constructors in your type. You will
 normally determine this in your main app entry point.
 
-@since 0.1.13.0
+Reworked 'RIO.GLogFunc'.
 -}
 newtype GLogFunc msg = GLogFunc (CallStack -> msg -> IO ())
 
@@ -862,31 +862,23 @@ newtype GLogFunc msg = GLogFunc (CallStack -> msg -> IO ())
 {- | Use this instance to wrap sub-loggers via 'RIO.mapRIO'.
 
 The 'Contravariant' class is available in base 4.12.0.
-
-@since 0.1.13.0
 -}
 instance Contravariant GLogFunc where
   contramap = contramapGLogFunc
   {-# INLINEABLE contramap #-}
 
-{- | Perform both sets of actions per log entry.
-
-@since 0.1.13.0
--}
+-- | Perform both sets of actions per log entry.
 instance Semigroup (GLogFunc msg) where
   GLogFunc f <> GLogFunc g = GLogFunc (\a b -> f a b *> g a b)
 
-{- | 'mempty' peforms no logging.
-
-@since 0.1.13.0
--}
+-- | 'mempty' peforms no logging.
 instance Monoid (GLogFunc msg) where
   mempty = mkGLogFunc $ \_ _ -> return ()
   mappend = (<>)
 
 {- | A vesion of 'contramapMaybeGLogFunc' which supports filering.
 
-@since 0.1.13.0
+Reworked 'RIO.contramapMaybeGLogFunc'.
 -}
 contramapMaybeGLogFunc :: (a -> Maybe b) -> GLogFunc b -> GLogFunc a
 contramapMaybeGLogFunc f (GLogFunc io) =
@@ -897,7 +889,7 @@ contramapMaybeGLogFunc f (GLogFunc io) =
 
 If you are on base > 4.12.0, you can just use 'contramap'.
 
-@since 0.1.13.0
+Reworked 'RIO.contramapGLogFunc'.
 -}
 contramapGLogFunc :: (a -> b) -> GLogFunc b -> GLogFunc a
 contramapGLogFunc f (GLogFunc io) = GLogFunc (\stack msg -> io stack (f msg))
@@ -908,7 +900,7 @@ write to a database or a log digestion service. For example:
 
 > mkGLogFunc (\stack msg -> send (Data.Aeson.encode (JsonLog stack msg)))
 
-@since 0.1.13.0
+Reworked 'RIO.mkGLogFunc'.
 -}
 mkGLogFunc :: (CallStack -> msg -> IO ()) -> GLogFunc msg
 mkGLogFunc = GLogFunc
@@ -919,7 +911,7 @@ newtype instance StaticRep (GLog (msg :: Type)) = GLog (GLogFunc msg)
 
 {- | Log a value generically.
 
-@since 0.1.13.0
+Reworked 'RIO.glog'.
 -}
 glog ::
   (GLog msg :> es) =>
@@ -936,7 +928,7 @@ glog t = do
 {- | Make a 'GLogFunc' via classic 'LogFunc'. Use this if you'd like
 to log your generic data type via the classic RIO terminal logger.
 
-@since 0.1.13.0
+Reworked 'RIO.glogFuncClassic'.
 -}
 gLogFuncClassic ::
   (HasLogLevel msg, HasLogSource msg, Display msg) => LogFunc -> GLogFunc msg
