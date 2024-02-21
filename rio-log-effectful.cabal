@@ -1,0 +1,122 @@
+cabal-version: 2.2
+
+-- This file has been generated from package.yaml by hpack version 0.36.0.
+--
+-- see: https://github.com/sol/hpack
+
+name:           rio-log-effectful
+version:        0.1.0.0
+description:    Please see the README on Github at <https://github.com/Lugendre/rio-log-effectful#readme>
+category:       Development
+homepage:       https://github.com/Lugendre/rio-log-effectful#readme
+bug-reports:    https://github.com/Lugendre/rio-log-effectful/issues
+author:         Lugendre
+maintainer:     franfranjk@gmail.com
+copyright:      2024 Lugendre
+license:        BSD-3-Clause
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    CHANGELOG.md
+
+source-repository head
+  type: git
+  location: https://github.com/Lugendre/rio-log-effectful
+
+library
+  exposed-modules:
+      Effectful.Log.Static
+      Util
+  other-modules:
+      Paths_rio_log_effectful
+  autogen-modules:
+      Paths_rio_log_effectful
+  hs-source-dirs:
+      src
+  default-extensions:
+      DataKinds
+      DerivingStrategies
+      DisambiguateRecordFields
+      ExplicitNamespaces
+      GADTs
+      LambdaCase
+      RoleAnnotations
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+  build-depends:
+      base >=4.11 && <10
+    , bytestring
+    , effectful
+    , effectful-core
+    , effectful-plugin
+    , effectful-th
+    , rio
+    , safe-exceptions
+    , text
+    , time
+  default-language: GHC2021
+
+executable test-run
+  main-is: Main.hs
+  other-modules:
+      Paths_rio_log_effectful
+  autogen-modules:
+      Paths_rio_log_effectful
+  hs-source-dirs:
+      app
+  default-extensions:
+      DataKinds
+      DerivingStrategies
+      DisambiguateRecordFields
+      ExplicitNamespaces
+      GADTs
+      LambdaCase
+      RoleAnnotations
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.11 && <10
+    , bytestring
+    , effectful
+    , effectful-core
+    , effectful-plugin
+    , effectful-th
+    , rio
+    , rio-log-effectful
+    , safe-exceptions
+    , text
+    , time
+  default-language: GHC2021
+
+test-suite rio-log-effectful-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Effectful.Log.StaticSpec
+      Paths_rio_log_effectful
+  autogen-modules:
+      Paths_rio_log_effectful
+  hs-source-dirs:
+      test
+  default-extensions:
+      DataKinds
+      DerivingStrategies
+      DisambiguateRecordFields
+      ExplicitNamespaces
+      GADTs
+      LambdaCase
+      RoleAnnotations
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.11 && <10
+    , bytestring
+    , effectful
+    , effectful-core
+    , effectful-plugin
+    , effectful-th
+    , hspec
+    , rio
+    , rio-log-effectful
+    , safe-exceptions
+    , text
+    , time
+  default-language: GHC2021

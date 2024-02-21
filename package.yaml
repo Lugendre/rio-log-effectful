@@ -1,0 +1,89 @@
+name:                rio-log-effectful
+version:             0.1.0.0
+homepage:            https://github.com/Lugendre/rio-log-effectful#readme
+github:              Lugendre/rio-log-effectful
+license:             BSD-3-Clause
+author:              Lugendre
+maintainer:          franfranjk@gmail.com
+copyright:           2024 Lugendre
+category:            Development
+
+extra-source-files:
+- README.md
+- CHANGELOG.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on Github at <https://github.com/Lugendre/rio-log-effectful#readme>
+
+language: GHC2021
+
+dependencies:
+- base >= 4.11 && < 10
+- bytestring
+- effectful
+- effectful-core
+- effectful-plugin
+- effectful-th
+- rio
+- safe-exceptions
+- text
+- time
+
+ghc-options:
+- -Wall
+- -Wcompat
+- -Widentities
+- -Wincomplete-record-updates
+- -Wincomplete-uni-patterns
+- -Wmissing-export-lists
+- -Wmissing-home-modules
+- -Wpartial-fields
+- -Wredundant-constraints
+
+# For GHC2024
+default-extensions:
+- DataKinds
+- DerivingStrategies
+- DisambiguateRecordFields
+- ExplicitNamespaces
+- GADTs
+- LambdaCase
+- RoleAnnotations
+
+library:
+  source-dirs: src
+
+executables:
+  test-run:
+    main:                Main.hs
+    source-dirs:         app
+    dependencies:
+    - rio-log-effectful
+    - effectful
+    - effectful-core
+    - effectful-plugin
+    - effectful-th
+    - text
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+
+tests:
+  rio-log-effectful-test:
+    main:                Spec.hs
+    source-dirs:         test
+    dependencies:
+    - rio-log-effectful
+    - hspec
+
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
