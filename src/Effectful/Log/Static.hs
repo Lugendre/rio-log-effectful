@@ -9,6 +9,7 @@ module Effectful.Log.Static (
   newLogFunc,
   LogFunc,
   Log,
+  StaticRep(Log),
   logOptionsHandle,
   runLogRaw,
   runLog,
