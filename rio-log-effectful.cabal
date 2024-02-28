@@ -27,6 +27,7 @@ source-repository head
 library
   exposed-modules:
       Effectful.Log.Static
+      Effectful.Log.StaticV2
   other-modules:
       Paths_rio_log_effectful
   autogen-modules:
@@ -113,6 +114,40 @@ test-suite rio-log-effectful-test
     , effectful-plugin
     , effectful-th
     , hspec
+    , rio
+    , rio-log-effectful
+    , safe-exceptions
+    , text
+    , time
+  default-language: GHC2021
+
+benchmark rio-log-effectful-bench
+  type: exitcode-stdio-1.0
+  main-is: Bench.hs
+  other-modules:
+      Paths_rio_log_effectful
+  autogen-modules:
+      Paths_rio_log_effectful
+  hs-source-dirs:
+      bench
+  default-extensions:
+      DataKinds
+      DerivingStrategies
+      DisambiguateRecordFields
+      ExplicitNamespaces
+      GADTs
+      LambdaCase
+      RoleAnnotations
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.11 && <10
+    , bytestring
+    , criterion
+    , deepseq
+    , effectful
+    , effectful-core
+    , effectful-plugin
+    , effectful-th
     , rio
     , rio-log-effectful
     , safe-exceptions
