@@ -7,7 +7,7 @@ Logger like RIO for Effectful
 ```haskell
 import RIO (stderr)
 import Effectful
-import Effectful.Logger.Static
+import Effectful.Log.Static
 
 main :: IO ()
 main = do
